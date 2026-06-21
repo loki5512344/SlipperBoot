@@ -52,16 +52,16 @@ make CROSS=riscv64-elf
 
 ## Структура проекта
 
-| Файл              | Назначение                                        |
-|-------------------|---------------------------------------------------|
-| `boot_entry.cpp`  | Голая `_start`: обнуление BSS, стек, вызов `boot_main` |
-| `boot_main.cpp`   | Основная последовательность загрузки (FDT, VirtIO, ELF) |
-| `uart.hpp`        | Драйвер NS16550A UART                             |
-| `virtio.hpp`      | Драйвер VirtIO v2 modern MMIO block               |
-| `elf.hpp`         | Парсер ELF64 (копирование PT_LOAD)                |
-| `fdt.hpp`         | Парсер Flattened Device Tree                      |
-| `linker.ld`       | Скрипт линковки (`BASE_ADDRESS = 0x80000000`)     |
-| `Makefile`        | Правила кросс-компиляции                          |
+| Файл                   | Назначение                                        |
+|------------------------|---------------------------------------------------|
+| `src/boot_entry.cpp`   | Голая `_start`: обнуление BSS, стек, вызов `boot_main` |
+| `src/boot_main.cpp`    | Основная последовательность загрузки (FDT, VirtIO, ELF) |
+| `include/uart.hpp`     | Драйвер NS16550A UART                             |
+| `include/virtio.hpp`   | Драйвер VirtIO v2 modern MMIO block               |
+| `include/elf.hpp`      | Парсер ELF64 (копирование PT_LOAD)                |
+| `include/fdt.hpp`      | Парсер Flattened Device Tree                      |
+| `linker.ld`            | Скрипт линковки (`BASE_ADDRESS = 0x80000000`)     |
+| `Makefile`             | Правила кросс-компиляции                          |
 
 ---
 

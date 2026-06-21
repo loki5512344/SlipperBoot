@@ -117,7 +117,7 @@ struct VirtIOBlock {
         write_reg(0x0A0, (uint32_t)(used_pa));
         write_reg(0x0A4, (uint32_t)(used_pa >> 32));
 
-        write_reg(0x044, 1);
+        write_reg(0x03C, 1);
 
         write_reg(0x070, 4);
 
@@ -156,7 +156,7 @@ struct VirtIOBlock {
         avail.idx++;
         __sync_synchronize();
 
-        write_reg(0x050, 0);
+        write_reg(0x040, 0);
 
         while (used.idx == last_used_idx)
             __sync_synchronize();

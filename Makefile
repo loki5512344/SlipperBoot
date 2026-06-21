@@ -5,10 +5,14 @@ CROSS = riscv64-unknown-elf
 CXX = $(CROSS)-g++
 OBJCOPY = $(CROSS)-objcopy
 CXXFLAGS = -march=rv64gc -mabi=lp64d -mcmodel=medany -ffreestanding -nostdlib -O2 -Wall -Wextra \
-           -fno-exceptions -fno-rtti
+           -fno-exceptions -fno-rtti -Iinclude
 LDFLAGS = -T linker.ld -nostdlib
 
-bootloader.elf: boot_entry.cpp boot_main.cpp
+SRCS = src/boot_entry.cpp src/boot_main.cpp
+
+all: bootloader.bin
+
+bootloader.elf: $(SRCS)
 	$(CXX) $(CXXFLAGS) $^ $(LDFLAGS) -o $@
 
 bootloader.bin: bootloader.elf

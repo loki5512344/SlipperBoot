@@ -48,16 +48,16 @@ make CROSS=riscv64-elf          # GNU MCU Eclipse variant
 
 ## Project Structure
 
-| File              | Role                                       |
-|-------------------|--------------------------------------------|
-| `boot_entry.cpp`  | Naked `_start`: BSS clear, stack setup, call `boot_main` |
-| `boot_main.cpp`   | Main boot sequence (FDT, VirtIO, ELF load) |
-| `uart.hpp`        | NS16550A UART driver                       |
-| `virtio.hpp`      | VirtIO v2 modern MMIO block driver         |
-| `elf.hpp`         | ELF64 parser (PT_LOAD copy to RAM)         |
-| `fdt.hpp`         | Flattened Device Tree parser               |
-| `linker.ld`       | Linker script (`BASE_ADDRESS = 0x80000000`)|
-| `Makefile`        | Cross‑compilation rules                    |
+| File                   | Role                                       |
+|------------------------|--------------------------------------------|
+| `src/boot_entry.cpp`   | Naked `_start`: BSS clear, stack setup, call `boot_main` |
+| `src/boot_main.cpp`    | Main boot sequence (FDT, VirtIO, ELF load) |
+| `include/uart.hpp`     | NS16550A UART driver                       |
+| `include/virtio.hpp`   | VirtIO v2 modern MMIO block driver         |
+| `include/elf.hpp`      | ELF64 parser (PT_LOAD copy to RAM)         |
+| `include/fdt.hpp`      | Flattened Device Tree parser               |
+| `linker.ld`            | Linker script (`BASE_ADDRESS = 0x80000000`)|
+| `Makefile`             | Cross‑compilation rules                    |
 
 ---
 
