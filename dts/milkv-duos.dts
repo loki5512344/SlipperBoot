@@ -1,0 +1,47 @@
+// Milk-V Duo S (Sophgo SG2000) — minimal FDT for SlipperBoot
+/dts-v1/;
+
+/ {
+    #address-cells = <2>;
+    #size-cells = <2>;
+    compatible = "sophgo,sg2000";
+    model = "Milk-V Duo S";
+
+    memory@80000000 {
+        device_type = "memory";
+        reg = <0x0 0x80000000 0x0 0x20000000>;
+    };
+
+    cpus {
+        #address-cells = <1>;
+        #size-cells = <0>;
+        cpu@0 {
+            device_type = "cpu";
+            compatible = "thead,c906", "riscv";
+            reg = <0>;
+            riscv,isa = "rv64imafdc";
+            mmu-type = "riscv,sv39";
+        };
+    };
+
+    soc {
+        #address-cells = <2>;
+        #size-cells = <2>;
+        ranges;
+
+        uart@4140000 {
+            compatible = "ns16550a";
+            reg = <0x0 0x04140000 0x0 0x100>;
+            interrupts = <32>;
+            clock-frequency = <25000000>;
+        };
+
+        sdhci@43100000 {
+            compatible = "sophgo,sg2000-sdhci", "snps,dw-mshc";
+            reg = <0x0 0x43100000 0x0 0x1000>;
+            interrupts = <73>;
+            bus-width = <4>;
+            no-1-8-v;
+        };
+    };
+};

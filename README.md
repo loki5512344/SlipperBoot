@@ -6,13 +6,13 @@
 </p>
 
 <h1 align="center">SlipperBoot</h1>
-<p align="center"><em>Minimalist RISC‑V 64‑bit bootloader written in freestanding C++</em></p>
+<p align="center"><em>Minimalist RISC-V 64-bit bootloader written in freestanding C++</em></p>
 
 ---
 
-**SlipperBoot** is a tiny, bare‑metal bootloader for RISC‑V 64‑bit (rv64gc) systems. It discovers hardware through the Flattened Device Tree (FDT), reads a kernel image (`kernel.elf`) from a VirtIO v2 modern MMIO block device, parses the ELF64 binary, and jumps to its entry point — all in ~4 KB of machine code.
+**SlipperBoot** is a tiny, bare-metal bootloader for RISC-V 64-bit (rv64gc) systems. It discovers hardware through the Flattened Device Tree (FDT), reads a kernel image (`kernel.elf`) from VirtIO or SDHCI block devices, parses the ELF64 binary, and jumps to its entry point - all in ~3.3 KB of machine code.
 
-It is the first‑stage loader for the [SlipperOS](https://github.com/anomalyco/SlipperOS) kernel.
+It is the first-stage loader for the [SlipperOS](https://github.com/anomalyco/SlipperOS) kernel.
 
 ---
 
@@ -20,13 +20,11 @@ It is the first‑stage loader for the [SlipperOS](https://github.com/anomalyco/
 
 ```console
 $ make
-riscv64-unknown-elf-g++ -march=rv64gc -mabi=lp64d -mcmodel=medany -ffreestanding -nostdlib -O2 -Wall -Wextra -fno-exceptions -fno-rtti boot_entry.cpp boot_main.cpp -T linker.ld -nostdlib -o bootloader.elf
-riscv64-unknown-elf-objcopy -O binary bootloader.elf bootloader.bin
 $ ls -lh bootloader.bin
--rw-r--r-- 1 user user 4.0K …
+-rw-r--r-- 1 user user 3.3K …
 ```
 
-Place `bootloader.bin` at address `0x80000000` (QEMU `-kernel` or raw flash) and `kernel.elf` on a VirtIO block device. The bootloader will locate the device via FDT, load the ELF, and hand off control.
+Place the binary at address `0x80000000` (QEMU `-kernel` or raw flash) and `kernel.elf` on a block device. The bootloader will discover devices via FDT, present a boot menu, load the ELF, verify integrity, and hand off control.
 
 ---
 
@@ -34,7 +32,7 @@ Place `bootloader.bin` at address `0x80000000` (QEMU `-kernel` or raw flash) and
 
 | Tool                       | Purpose                  |
 |----------------------------|--------------------------|
-| `riscv64-unknown-elf-g++`  | Default cross‑compiler   |
+| `riscv64-unknown-elf-g++`  | Default cross-compiler   |
 | `riscv64-unknown-elf-objcopy` | Binary extraction     |
 | `make`                     | Build orchestration      |
 
@@ -51,25 +49,33 @@ make CROSS=riscv64-elf          # GNU MCU Eclipse variant
 | File                   | Role                                       |
 |------------------------|--------------------------------------------|
 | `src/boot_entry.cpp`   | Naked `_start`: BSS clear, stack setup, call `boot_main` |
-| `src/boot_main.cpp`    | Main boot sequence (FDT, VirtIO, ELF load) |
-| `include/uart.hpp`     | NS16550A UART driver                       |
-| `include/virtio.hpp`   | VirtIO v2 modern MMIO block driver         |
-| `include/elf.hpp`      | ELF64 parser (PT_LOAD copy to RAM)         |
-| `include/fdt.hpp`      | Flattened Device Tree parser               |
-| `linker.ld`            | Linker script (`BASE_ADDRESS = 0x80000000`)|
-| `Makefile`             | Cross‑compilation rules                    |
+| `src/boot_main.cpp`    | Main boot sequence (FDT, devices, ELF load) |
+| `include/uart.hpp`     | NS16550A UART driver                        |
+| `include/virtio.hpp`   | VirtIO v2 modern MMIO block driver          |
+| `include/sdhci.hpp`    | SDHCI SD card driver                        |
+| `include/bootmenu.hpp` | Interactive boot device menu                |
+| `include/elf.hpp`      | ELF64 parser + integrity check              |
+| `include/fdt.hpp`      | Flattened Device Tree core parser           |
+| `include/fdt_dev.hpp`  | Device finders (UART, VirtIO, SDHCI)        |
+| `dts/milkv-duos.dts`   | Device tree source for Milk-V Duo S         |
+| `linker.ld`            | Linker script (`BASE_ADDRESS = 0x80000000`) |
+| `Makefile`             | Cross-compilation rules                     |
 
 ---
 
 ## Technical Details
 
-- **Freestanding** — no libc, no libstdc++, no global constructors, no static objects.
-- **No assembly files** — all privileged code (BSS, stack, WFI) lives in `boot_entry.cpp` via inline `asm`.
-- **FDT‑based discovery** — scans the device tree for `"ns16550a"` (UART console) and `"virtio,mmio"` (block device).
-- **VirtIO v2 only** — modern MMIO interface with `VIRTIO_F_VERSION_1` mandatory.
-- **ELF64 loader** — iterates `PT_LOAD` segments, copies them to their target addresses, and calls `entry(hart_id=0, fdt_addr)`.
-- **Stack** — 4 KB. **Binary budget** — 32 KB max. Current build ~4 KB.
-- **License** — GPL‑3.0.
+- **Freestanding** - no libc, no libstdc++, no global constructors, no static objects.
+- **No assembly files** - all privileged code (BSS, stack, WFI) lives in `boot_entry.cpp` via inline `asm`.
+- **FDT-based discovery** - scans for UART (`ns16550a`), VirtIO (`virtio,mmio`), and SDHCI (`snps,dw-mshc`) devices.
+- **VirtIO v2 & SDHCI** - supports both VirtIO MMIO block devices and standard SDHCI controllers.
+- **Boot menu** - interactive device selection over UART.
+- **ELF integrity check** - detects segment overlap with bootloader memory.
+- **Progress bar** - visual feedback during kernel loading.
+- **FDT-driven** - DTB passed from previous stage via a1, no hardcoded targets.
+- **ELF64 loader** - iterates `PT_LOAD` segments, copies to target addresses, calls `entry(hart_id=0, fdt_addr)`.
+- **Stack** - 8 KB. **Binary budget** - 32 KB max. Current build ~3.3 KB.
+- **License** - GPL-3.0.
 
 ---
 

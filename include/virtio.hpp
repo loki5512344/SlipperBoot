@@ -124,7 +124,7 @@ struct VirtIOBlock {
         return true;
     }
 
-    void read_sector(uint64_t lba, void* buf) {
+    bool read_sector(uint64_t lba, void* buf) {
         virtio_blk_req hdr;
         hdr.type = 0;
         hdr.ioprio = 0;
@@ -161,5 +161,7 @@ struct VirtIOBlock {
         while (used.idx == last_used_idx)
             __sync_synchronize();
         last_used_idx = used.idx;
+
+        return status == 0;
     }
 };

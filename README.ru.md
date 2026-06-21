@@ -6,14 +6,14 @@
 </p>
 
 <h1 align="center">SlipperBoot</h1>
-<p align="center"><em>Минималистичный RISC‑V 64‑bit загрузчик на голом C++</em></p>
+<p align="center"><em>Минималистичный RISC-V 64-bit загрузчик на голом C++</em></p>
 
 ---
 
-**SlipperBoot** — крошечный bare-metal загрузчик для RISC‑V 64‑bit (rv64gc).
+**SlipperBoot** - крошечный bare-metal загрузчик для RISC-V 64-bit (rv64gc).
 Обнаруживает железо через Flattened Device Tree (FDT), читает образ ядра
 (`kernel.elf`) с VirtIO v2 modern MMIO блочного устройства, парсит ELF64
-и прыгает в точку входа — всё в ~4 КБ машинного кода.
+и прыгает в точку входа - всё в ~4 КБ машинного кода.
 
 Загрузчик первой ступени для ядра [SlipperOS](https://github.com/anomalyco/SlipperOS).
 
@@ -26,11 +26,11 @@ $ make
 riscv64-unknown-elf-g++ -march=rv64gc -mabi=lp64d -mcmodel=medany -ffreestanding -nostdlib -O2 -Wall -Wextra -fno-exceptions -fno-rtti boot_entry.cpp boot_main.cpp -T linker.ld -nostdlib -o bootloader.elf
 riscv64-unknown-elf-objcopy -O binary bootloader.elf bootloader.bin
 $ ls -lh bootloader.bin
--rw-r--r-- 1 user user 4.0K …
+-rw-r--r-- 1 user user 4.0K ...
 ```
 
 Положите `bootloader.bin` по адресу `0x80000000` (QEMU `-kernel` или raw flash),
-а `kernel.elf` — на VirtIO блочное устройство. Загрузчик найдёт устройство
+а `kernel.elf` - на VirtIO блочное устройство. Загрузчик найдёт устройство
 через FDT, загрузит ELF и передаст управление.
 
 ---
@@ -67,13 +67,13 @@ make CROSS=riscv64-elf
 
 ## Технические детали
 
-- **Без стандартной библиотеки** — нет libc, libstdc++, глобальных конструкторов, статических объектов.
-- **Нет файлов `.S`** — весь привилегированный код (BSS, стек, WFI) в `boot_entry.cpp` через inline `asm`.
-- **FDT discovery** — сканирует device tree в поисках `"ns16550a"` (UART) и `"virtio,mmio"` (VirtIO).
-- **VirtIO v2 только** — современный MMIO интерфейс, обязателен `VIRTIO_F_VERSION_1`.
-- **ELF64 загрузчик** — итерирует `PT_LOAD` сегменты, копирует в целевую память, вызывает `entry(hart_id=0, fdt_addr)`.
-- **Стек** — 4 КБ. **Лимит бинарника** — 32 КБ. Текущая сборка ~4 КБ.
-- **Лицензия** — GPL‑3.0.
+- **Без стандартной библиотеки** - нет libc, libstdc++, глобальных конструкторов, статических объектов.
+- **Нет файлов `.S`** - весь привилегированный код (BSS, стек, WFI) в `boot_entry.cpp` через inline `asm`.
+- **FDT discovery** - сканирует device tree в поисках `"ns16550a"` (UART) и `"virtio,mmio"` (VirtIO).
+- **VirtIO v2 только** - современный MMIO интерфейс, обязателен `VIRTIO_F_VERSION_1`.
+- **ELF64 загрузчик** - итерирует `PT_LOAD` сегменты, копирует в целевую память, вызывает `entry(hart_id=0, fdt_addr)`.
+- **Стек** - 4 КБ. **Лимит бинарника** - 32 КБ. Текущая сборка ~4 КБ.
+- **Лицензия** - GPL-3.0.
 
 ---
 

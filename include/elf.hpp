@@ -59,6 +59,20 @@ struct ELF64 {
     bool valid() const { return valid_elf; }
     uint64_t entry() const { return entry_point; }
 
+    bool check_safe(uint64_t boot_start, uint64_t boot_end) const {
+        if (!valid_elf) return false;
+        auto* phdr = (const elf64_phdr*)((const uint8_t*)ehdr + ehdr->e_phoff);
+        for (int i = 0; i < ehdr->e_phnum; i++) {
+            if (phdr[i].p_type != 1) continue;
+            uint64_t seg_start = phdr[i].p_paddr;
+            uint64_t seg_end = seg_start + phdr[i].p_memsz;
+            if (seg_end < seg_start) return false;
+            if (seg_start < boot_end && seg_end > boot_start) return false;
+            if (seg_end > 0xFFFFFFFFFFFFFFFFULL) return false;
+        }
+        return true;
+    }
+
     void load_all() const {
         auto* phdr = (const elf64_phdr*)((const uint8_t*)ehdr + ehdr->e_phoff);
         for (int i = 0; i < ehdr->e_phnum; i++) {
