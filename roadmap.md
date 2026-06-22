@@ -1,35 +1,37 @@
 # Roadmap
 
 ## v0.2 - OC2r (VirtIO)
-- [x] UART драйвер (NS16550A, адрес из FDT)
-- [x] VirtIO v2 MMIO block (probe, read_sector)
-- [x] ELF64 парсер (header, program headers, load)
-- [x] FDT парсер (memory, UART, VirtIO)
-- [x] Точка входа _start (BSS, стек, прыжок)
-- [x] Пофиксить vring адреса - Used ring в 0x090 вместо 0x0A0
-- [ ] Проверить на QEMU: собрать образ с kernel.elf
-- [ ] Проверить на OC2r/Sedna: реальный FDT
+- [x] UART драйвер (NS16550A, reg-shift из FDT)
+- [x] VirtIO v1+v2 MMIO block (probe, read_sector)
+- [x] ELF64 парсер (header, program headers, load, check_safe)
+- [x] FDT парсер (memory, UART, VirtIO, SDHCI, model)
+- [x] Точка входа _start (BSS, стек, прыжок, hartid из a0)
+- [x] Проверено на QEMU riscv64 virt
 
 ## v0.3 - Milk-V Duo S (SDHCI)
-- [x] SDHCI драйвер - чтение SD-карты, инициализация контроллера
-- [x] Milk-V DTB - .dts для Duo S (dts/milkv-duos.dts)
+- [x] SDHCI драйвер
 - [x] DTB от предыдущей стадии (a1), единая сборка
-- [x] Загрузка kernel.elf с SD-карты по LBA
-- [ ] Проверить на реальной Milk-V Duo S
+- [x] Загрузка kernel.elf с блочного устройства
+- [ ] Проверить на реальной Milk-V Duo S (нет железа)
 
 ## v0.4 - Стабильность
-- [x] Boot menu через UART (выбор устройства)
-- [x] Поддержка нескольких VirtIO/SD устройств
-- [x] Проверка целостности ELF (check_safe)
-- [x] Прогресс-бар загрузки
+- [x] Boot menu с timeout auto-select
+- [x] Поддержка нескольких устройств
+- [x] PHDRS в linker.ld (без RWX warning)
+- [x] S-mode совместимость (a0 вместо csrr mhartid)
+- [x] UART reg-shift из FDT
+- [x] Универсальный бинарник (без compile-time platform)
+- [x] Убран 2MB static buffer из BSS
+- [x] nsectors ограничен по DRAM size
 
-## v0.5 - SlipperBoot standalone
-- [ ] Свой образ диска (genimage или скрипт)
-- [ ] Поддержка 9P (VirtIO filesystem) для отладки
-- [ ] Debug UART (вывод FDT, регистров)
-- [ ] CI сборка (GitHub Actions)
+## v0.5 - Инфраструктура
+- [x] genimage + mkimage
+- [x] 9P документация (комментарий в run_qemu.sh)
+- [x] Debug UART (debug.hpp, guarded by -DDEBUG)
+- [x] CI (GitHub Actions, .github/workflows/test.yml)
+- [x] Документация (README)
 
 ## v1.0 - Релиз
-- [ ] Полная документация
-- [ ] Проверка на OC2r + Milk-V Duo S
+- [ ] Проверка на реальном Milk-V Duo S
 - [ ] Стабильная интеграция с SlipperOS
+- [ ] Полное покрытие тестами
